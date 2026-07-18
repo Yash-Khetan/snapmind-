@@ -3,10 +3,10 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from database.database import get_db
-from backend.models.user_model import UserRecord
-from backend.models.image_model import ImageRecord
-from backend.models.connection_model import Connection
-from backend.utils.auth import get_current_user
+from models.user_model import UserRecord
+from models.image_model import ImageRecord
+from models.connection_model import Connection
+from utils.auth import get_current_user
 
 
 router = APIRouter(tags=["Connections"])

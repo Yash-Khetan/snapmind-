@@ -1,0 +1,93 @@
+import { useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { login as apiLogin } from "../api/auth";
+import { useAuth } from "../hooks/useAuth";
+import type { ApiError } from "../api/client";
+
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await apiLogin(email, password);
+      await login(res.token);
+      navigate("/app");
+    } catch (err) {
+      const apiErr = err as ApiError;
+      setError(apiErr.message || "Invalid email or password.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-bg flex items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        <Link to="/" className="text-base font-semibold text-text-primary no-underline tracking-tight block text-center mb-8">
+          SnapMind
+        </Link>
+
+        <h1 className="text-xl font-semibold text-center mb-6 tracking-tight">Sign in</h1>
+
+        {error && (
+          <div className="text-sm text-danger bg-red-50 border border-red-100 rounded-md px-3 py-2 mb-4">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="login-email" className="block text-[13px] font-medium text-text-secondary mb-1.5">
+              Email
+            </label>
+            <input
+              id="login-email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-border rounded-md bg-surface text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+              placeholder="you@example.com"
+            />
+          </div>
+          <div>
+            <label htmlFor="login-password" className="block text-[13px] font-medium text-text-secondary mb-1.5">
+              Password
+            </label>
+            <input
+              id="login-password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-border rounded-md bg-surface text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+              placeholder="••••••••"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-2.5 text-sm font-medium bg-text-primary text-white rounded-md hover:opacity-90 disabled:opacity-50 cursor-pointer border-none"
+          >
+            {loading ? "Signing in…" : "Sign in"}
+          </button>
+        </form>
+
+        <p className="text-[13px] text-text-secondary text-center mt-6">
+          Don't have an account?{" "}
+          <Link to="/register" className="text-accent hover:underline">
+            Create one
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}

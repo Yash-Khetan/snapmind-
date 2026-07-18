@@ -18,9 +18,9 @@ Base = declarative_base()
 
 def init_db():
     """Initializes the SQLite tables if they do not exist."""
-    import backend.models.image_model
-    import backend.models.user_model
-    import backend.models.connection_model
+    import models.image_model
+    import models.user_model
+    import models.connection_model
     Base.metadata.create_all(bind=engine)
 
 def get_db():
@@ -34,7 +34,7 @@ def insert_image_record(filename: str, filepath: str, ocr_text: str = None, cate
     """
     Inserts a new image record into the Images SQLite table and returns the generated primary key ID.
     """
-    from backend.models.image_model import ImageRecord
+    from models.image_model import ImageRecord
     init_db()  # Ensure table exists before inserting
     db = SessionLocal()
     try:

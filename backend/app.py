@@ -4,10 +4,12 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from database.database import init_db
-from backend.routes.upload_routes import router as upload_router
-from backend.routes.auth_routes import router as auth_router
-from backend.routes.search_routes import router as search_router
-from backend.routes.connection_routes import router as connection_router
+from routes.upload_routes import router as upload_router
+from routes.auth_routes import router as auth_router
+from routes.search_routes import router as search_router
+from routes.connection_routes import router as connection_router
+from routes.image_routes import router as image_router
+from routes.graph_routes import router as graph_router
 
 # Load environment variables from .env
 load_dotenv()
@@ -37,10 +39,12 @@ IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/images", StaticFiles(directory=str(IMAGES_DIR)), name="images")
 
 # Register routes
-app.include_router(upload_router)
-app.include_router(auth_router)
-app.include_router(search_router)
-app.include_router(connection_router)
+app.include_router(upload_router, prefix="/api")
+app.include_router(auth_router, prefix="/api")
+app.include_router(search_router, prefix="/api")
+app.include_router(connection_router, prefix="/api")
+app.include_router(image_router, prefix="/api")
+app.include_router(graph_router, prefix="/api")
 
 @app.get("/")
 def health_check():

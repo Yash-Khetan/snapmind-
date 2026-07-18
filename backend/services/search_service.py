@@ -3,8 +3,8 @@ from typing import List, Dict, Any
 import numpy as np
 from sqlalchemy.orm import Session
 
-from backend.models.image_model import ImageRecord
-from backend.services.embeddings_service import generate_text_embedding
+from models.image_model import ImageRecord
+from services.embeddings_service import generate_text_embedding
 
 # Default number of top results to return
 TOP_K = 5

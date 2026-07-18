@@ -3,9 +3,9 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from database.database import get_db
-from backend.models.user_model import UserRecord
-from backend.utils.auth import get_current_user
-from backend.services.search_service import search_images
+from models.user_model import UserRecord
+from utils.auth import get_current_user
+from services.search_service import search_images
 
 router = APIRouter(tags=["Search"])
 

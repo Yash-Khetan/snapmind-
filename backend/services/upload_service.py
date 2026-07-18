@@ -1,10 +1,10 @@
 from typing import List
 from fastapi import UploadFile
 from database.database import insert_image_record, SessionLocal
-from backend.utils.file_utils import save_upload_file
-from backend.services.ocr_service import extract_text_from_image
-from backend.services.embeddings_service import generate_text_embedding
-from backend.services.connection_service import create_connections_for_image
+from utils.file_utils import save_upload_file
+from services.ocr_service import extract_text_from_image
+from services.embeddings_service import generate_text_embedding
+from services.connection_service import create_connections_for_image
 
 class UploadService:
     def __init__(self):

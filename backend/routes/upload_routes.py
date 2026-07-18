@@ -1,8 +1,8 @@
 from typing import List, Optional
 from fastapi import APIRouter, File, UploadFile, HTTPException, Request, Depends
-from backend.services.upload_service import upload_service
-from backend.models.user_model import UserRecord
-from backend.utils.auth import get_current_user
+from services.upload_service import upload_service
+from models.user_model import UserRecord
+from utils.auth import get_current_user
 
 router = APIRouter()
 

@@ -62,7 +62,7 @@ def get_current_user(
     FastAPI dependency that extracts and validates the JWT from the
     Authorization: Bearer <token> header, then returns the UserRecord.
     """
-    from backend.models.user_model import UserRecord
+    from models.user_model import UserRecord
 
     token = credentials.credentials
     credentials_exception = HTTPException(

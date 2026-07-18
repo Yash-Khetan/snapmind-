@@ -1,9 +1,9 @@
 from typing import List
 from sqlalchemy.orm import Session
 
-from backend.models.image_model import ImageRecord
-from backend.models.connection_model import Connection
-from backend.services.search_service import cosine_similarity
+from models.image_model import ImageRecord
+from models.connection_model import Connection
+from services.search_service import cosine_similarity
 
 # Default number of top connections to create for an image
 TOP_K = 5
