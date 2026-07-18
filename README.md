@@ -2,6 +2,8 @@
 
 Snapmind is an image upload backend built with FastAPI and SQLite. Uploaded images are saved to a local `images/` folder, and metadata is stored in a SQLite `Images` table.
 
+![alt text](image.png)
+
 ## Features
 
 - Single image upload endpoint
