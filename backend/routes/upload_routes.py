@@ -36,39 +36,24 @@ async def upload_file(
     return await upload_service.process_file(file_to_process)
 
 
-# from typing import List, Union
-# from fastapi import APIRouter, File, UploadFile, HTTPException, Request
+@router.post("/upload-multiple")
+async def upload_multiple_files(
+    images: List[UploadFile] = File(...),
+    current_user: UserRecord = Depends(get_current_user),
+):
+    """
+    Accepts multiple uploaded images from the 'images' form field.
+    Each file is processed through the same pipeline as /upload:
+    save → OCR → embedding → DB insert → semantic connections.
+    Per-file errors are isolated so one failure doesn't abort the batch.
+    """
+    # Filter out empty filename placeholders sent by some HTTP clients
+    files_to_process = [f for f in images if f.filename]
 
-# router = APIRouter()
+    if not files_to_process:
+        raise HTTPException(
+            status_code=400,
+            detail="No files received. Use form-data with one or more files under the 'images' field.",
+        )
 
-# @router.post("/upload-multiple")
-# async def upload_multiple_files(
-#     # Union allows FastAPI to parse both a single file or a list of files cleanly
-#     images: Union[List[UploadFile], UploadFile, None] = File(None)
-# ):
-#     """
-#     Accepts single or multiple uploaded images from the 'images' form field.
-#     """
-#     files_to_process = []
-
-#     # 1. Normalize the input into a standard flat python list
-#     if images:
-#         if isinstance(images, list):
-#             files_to_process = images
-#         else:
-#             files_to_process = [images]
-
-#     # 2. Guard rail checking if files were actually provided
-#     # (Checking if filename is empty handles empty file placeholders sent by some clients)
-#     files_to_process = [f for f in files_to_process if f.filename != ""]
-
-#     if not files_to_process:
-#         raise HTTPException(
-#             status_code=400,
-#             detail="No files received. Use form-data with one or more files under the 'images' field."
-#         )
-
-#     # 3. Pass to your service layer
-#     return await upload_service.process_files(files_to_process)
-
-
+    return await upload_service.process_files(files_to_process)

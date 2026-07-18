@@ -20,6 +20,7 @@ def init_db():
     """Initializes the SQLite tables if they do not exist."""
     import backend.models.image_model
     import backend.models.user_model
+    import backend.models.connection_model
     Base.metadata.create_all(bind=engine)
 
 def get_db():

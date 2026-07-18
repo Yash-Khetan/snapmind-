@@ -7,7 +7,7 @@ from backend.models.image_model import ImageRecord
 from backend.services.embeddings_service import generate_text_embedding
 
 # Minimum cosine similarity threshold — only images scoring above this are returned
-SIMILARITY_THRESHOLD = 0.8
+SIMILARITY_THRESHOLD = 0.5
 
 
 def cosine_similarity(vec_a: list, vec_b: list) -> float:
@@ -15,8 +15,11 @@ def cosine_similarity(vec_a: list, vec_b: list) -> float:
     Computes cosine similarity between two vectors.
     Returns a float in [-1, 1].  Higher = more similar.
     """
-    a = np.array(vec_a, dtype=np.float64)
-    b = np.array(vec_b, dtype=np.float64)
+    a = np.array(vec_a, dtype=np.float64).flatten()
+    b = np.array(vec_b, dtype=np.float64).flatten()
+
+    if a.shape != b.shape:
+        return 0.0
 
     dot_product = np.dot(a, b)
     norm_a = np.linalg.norm(a)

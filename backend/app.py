@@ -7,6 +7,7 @@ from database.database import init_db
 from backend.routes.upload_routes import router as upload_router
 from backend.routes.auth_routes import router as auth_router
 from backend.routes.search_routes import router as search_router
+from backend.routes.connection_routes import router as connection_router
 
 # Load environment variables from .env
 load_dotenv()
@@ -39,6 +40,7 @@ app.mount("/images", StaticFiles(directory=str(IMAGES_DIR)), name="images")
 app.include_router(upload_router)
 app.include_router(auth_router)
 app.include_router(search_router)
+app.include_router(connection_router)
 
 @app.get("/")
 def health_check():
