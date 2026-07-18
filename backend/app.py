@@ -32,12 +32,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files so uploaded images can be accessed directly at /images/<filename>
-ROOT_DIR = Path(__file__).resolve().parent.parent
-IMAGES_DIR = ROOT_DIR / "images"
-IMAGES_DIR.mkdir(parents=True, exist_ok=True)
-app.mount("/images", StaticFiles(directory=str(IMAGES_DIR)), name="images")
-
+# Static file serving for images is removed because images are now stored in Supabase private buckets
+# and served via signed URLs.
 # Register routes
 app.include_router(upload_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")

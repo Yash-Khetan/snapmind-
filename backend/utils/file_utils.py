@@ -2,18 +2,12 @@ import os
 import uuid
 from pathlib import Path
 from fastapi import UploadFile
-
-# Define root project directory and images directory
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent
-IMAGES_DIR = ROOT_DIR / "images"
-
-# Ensure the images directory exists
-IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+from utils.supabase_client import supabase
 
 async def save_upload_file(upload_file: UploadFile) -> str:
     """
-    Saves an UploadFile to the 'images/' directory with a unique filename.
-    Returns the relative path: 'images/unique_name.ext'
+    Uploads an UploadFile to the 'images' Supabase storage bucket with a unique filename.
+    Returns the storage path: 'images/unique_name.ext'
     """
     # Extract original filename and extension
     original_filename = upload_file.filename or "unknown.png"
@@ -23,15 +17,27 @@ async def save_upload_file(upload_file: UploadFile) -> str:
         
     # Generate unique filename using UUID to prevent collisions
     unique_filename = f"{uuid.uuid4().hex}{extension}"
-    target_path = IMAGES_DIR / unique_filename
+    # We prefix with 'images/' just to keep the path consistent with what we had before,
+    # or you can just store 'unique_filename' if the bucket is named 'images'.
+    # For now, let's store it at the root of the 'images' bucket.
+    storage_path = f"{unique_filename}"
     
-    # Stream chunks from the uploaded file and write directly to disk
-    with open(target_path, "wb") as buffer:
-        while chunk := await upload_file.read(1024 * 1024):  # Read in 1MB chunks
-            buffer.write(chunk)
-            
+    # Read the file content
+    file_bytes = await upload_file.read()
+    
+    # Upload to Supabase 'images' bucket
+    # The file bytes are sent directly
+    res = supabase.storage.from_("images").upload(
+        path=storage_path,
+        file=file_bytes,
+        file_options={"content-type": upload_file.content_type or "image/png"}
+    )
+    
     # Reset file cursor just in case it is read again later
     await upload_file.seek(0)
     
-    # Return path exactly as specified: "images/abc.png"
-    return f"images/{unique_filename}"
+    # Return path. We prefix with "images/" so the database stores "images/xyz.png"
+    # This matches old behavior, but we will strip the "images/" part when generating signed URLs
+    # OR we can just return unique_filename and update the DB records during migration.
+    # Returning unique_filename is cleaner for Supabase bucket logic.
+    return unique_filename

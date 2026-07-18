@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 from PIL import Image
 import pytesseract
+import io
 
 
 def _ensure_tesseract_cmd():
@@ -40,4 +41,20 @@ def extract_text_from_image(relative_image_path: str) -> str:
 
     except Exception as e:
         print(f"OCR error for {relative_image_path}: {e}")
+        return f"OCR Error: {str(e)}"
+
+def extract_text_from_bytes(file_bytes: bytes) -> str:
+    """
+    Takes raw image bytes and returns the extracted OCR text string.
+    """
+    _ensure_tesseract_cmd()
+    
+    try:
+        with Image.open(io.BytesIO(file_bytes)) as img:
+            raw_text = pytesseract.image_to_string(img)
+            # Replace all newlines, carriage returns, and multiple spaces with a single space
+            return re.sub(r'\s+', ' ', raw_text).strip()
+
+    except Exception as e:
+        print(f"OCR error from bytes: {e}")
         return f"OCR Error: {str(e)}"

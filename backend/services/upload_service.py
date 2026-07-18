@@ -2,7 +2,7 @@ from typing import List
 from fastapi import UploadFile
 from database.database import insert_image_record, SessionLocal
 from utils.file_utils import save_upload_file
-from services.ocr_service import extract_text_from_image
+from services.ocr_service import extract_text_from_image, extract_text_from_bytes
 from services.embeddings_service import generate_text_embedding
 from services.connection_service import create_connections_for_image
 
@@ -25,12 +25,16 @@ class UploadService:
 
         # Save file to images/ directory
         print(f"[DEBUG] Step 1: Saving file '{original_filename}' to disk...")
+        # Note: We need to read the bytes before passing them to OCR
+        file_bytes = await file.read()
+        await file.seek(0)  # Reset cursor for save_upload_file
+        
         file_path = await save_upload_file(file)
         print(f"[DEBUG] Step 1 complete: File saved to '{file_path}'")
 
-        # Run OCR extraction on the saved image
-        print(f"[DEBUG] Step 2: Running OCR extraction on '{file_path}'...")
-        extracted_ocr_text = extract_text_from_image(file_path)
+        # Run OCR extraction on the image bytes
+        print(f"[DEBUG] Step 2: Running OCR extraction on bytes...")
+        extracted_ocr_text = extract_text_from_bytes(file_bytes)
         print(f"[DEBUG] Step 2 complete: Extracted {len(extracted_ocr_text) if extracted_ocr_text else 0} chars of OCR text")
 
         # Generate vector embeddings from the extracted OCR text

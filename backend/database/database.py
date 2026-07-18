@@ -1,21 +1,24 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
-DB_PATH = ROOT_DIR / "database" / "snapmind.db"
+load_dotenv()
 
-# Ensure database directory exists
-DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+# We expect a postgresql:// URL from Supabase in the .env
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+if not SQLALCHEMY_DATABASE_URL:
+    raise ValueError("DATABASE_URL must be set in .env")
 
-SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
+# Handle the case where the URL starts with postgres:// instead of postgresql://
+if SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
+    SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
+# PostgreSQL usually doesn't need check_same_thread=False (that's for SQLite)
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
-
 def init_db():
     """Initializes the SQLite tables if they do not exist."""
     import models.image_model

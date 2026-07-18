@@ -6,6 +6,7 @@ from database.database import get_db
 from models.user_model import UserRecord
 from utils.auth import get_current_user
 from services.search_service import search_images
+from utils.supabase_client import get_signed_url
 
 router = APIRouter(tags=["Search"])
 
@@ -51,6 +52,10 @@ def search(
 
     # Run the semantic search
     results = search_images(query=body.query.strip(), db=db)
+    
+    # Update filepaths with signed URLs
+    for result in results:
+        result["filepath"] = get_signed_url(result["filepath"])
 
     # Append this query to the user's query history
     existing_queries = current_user.queries or []

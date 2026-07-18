@@ -86,6 +86,9 @@ export async function apiPostFormData<T>(path: string, formData: FormData): Prom
 }
 
 export function getImageUrl(filepath: string): string {
+  if (filepath.startsWith("http://") || filepath.startsWith("https://")) {
+    return filepath;
+  }
   // filepath is like "images/abc123.png", backend serves at /images/<filename>
   return `${HOST_URL}/${filepath}`;
 }

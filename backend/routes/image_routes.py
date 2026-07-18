@@ -8,7 +8,7 @@ from models.user_model import UserRecord
 from models.image_model import ImageRecord
 from models.connection_model import Connection
 from utils.auth import get_current_user
-
+from utils.supabase_client import get_signed_url
 
 router = APIRouter(tags=["Images"])
 
@@ -65,7 +65,7 @@ def list_images(
             ImageListItem(
                 id=img.id,
                 filename=img.filename,
-                filepath=img.filepath,
+                filepath=get_signed_url(img.filepath),
                 ocr_text=img.ocr_text,
                 uploaded_at=img.uploaded_at.isoformat() if img.uploaded_at else "",
                 connections_count=conn_count,
@@ -107,7 +107,7 @@ def get_image(
     return ImageDetailResponse(
         id=image.id,
         filename=image.filename,
-        filepath=image.filepath,
+        filepath=get_signed_url(image.filepath),
         ocr_text=image.ocr_text,
         uploaded_at=image.uploaded_at.isoformat() if image.uploaded_at else "",
         connections_count=conn_count,
