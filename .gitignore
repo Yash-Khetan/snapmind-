@@ -91,3 +91,5 @@ models_cache/
 *~
 .DS_Store
 Thumbs.db
+
+/images
