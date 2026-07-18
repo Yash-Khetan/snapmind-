@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from backend.models.image_model import ImageRecord
 from backend.services.embeddings_service import generate_text_embedding
 
-# Minimum cosine similarity threshold — only images scoring above this are returned
-SIMILARITY_THRESHOLD = 0.5
+# Default number of top results to return
+TOP_K = 5
 
 
 def cosine_similarity(vec_a: list, vec_b: list) -> float:
@@ -32,13 +32,12 @@ def cosine_similarity(vec_a: list, vec_b: list) -> float:
     return float(dot_product / (norm_a * norm_b))
 
 
-def search_images(query: str, db: Session) -> List[Dict[str, Any]]:
+def search_images(query: str, db: Session, top_k: int = TOP_K) -> List[Dict[str, Any]]:
     """
     1. Generate an embedding for the user's query text.
     2. Fetch all image records that have a stored embedding.
     3. Compute cosine similarity between the query embedding and each image embedding.
-    4. Return ALL images whose similarity score >= SIMILARITY_THRESHOLD (0.8),
-       sorted by similarity descending.
+    4. Return the top K (default 5) most similar images, sorted by similarity descending.
     """
     # Step 1 — embed the query
     query_embedding = generate_text_embedding(query)
@@ -59,16 +58,15 @@ def search_images(query: str, db: Session) -> List[Dict[str, Any]]:
     scored_results = []
     for image in images:
         score = cosine_similarity(query_embedding, image.embeddings)
-        if score >= SIMILARITY_THRESHOLD:
-            scored_results.append({
-                "id": image.id,
-                "filename": image.filename,
-                "filepath": image.filepath,
-                "ocr_text": image.ocr_text,
-                "similarity_score": round(score, 4),
-            })
+        scored_results.append({
+            "id": image.id,
+            "filename": image.filename,
+            "filepath": image.filepath,
+            "ocr_text": image.ocr_text,
+            "similarity_score": round(score, 4),
+        })
 
-    # Step 4 — sort by similarity descending
+    # Step 4 — sort by similarity descending and return top K
     scored_results.sort(key=lambda x: x["similarity_score"], reverse=True)
 
-    return scored_results
+    return scored_results[:top_k]

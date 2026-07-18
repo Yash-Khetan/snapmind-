@@ -40,8 +40,8 @@ def search(
 ):
     """
     Accepts a text query, generates its embedding, computes cosine similarity
-    against all stored image embeddings, and returns every image with
-    similarity >= 0.8.  The query is appended to the user's query history.
+    against all stored image embeddings, and returns the top K (default 5)
+    most similar images.  The query is appended to the user's query history.
     """
     if not body.query or not body.query.strip():
         raise HTTPException(

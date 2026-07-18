@@ -73,7 +73,7 @@ def get_connections(
                 )
             )
 
-    # Sort by similarity descending
+    # Sort by similarity descending and return top K (5)
     results.sort(key=lambda x: x.similarity_score, reverse=True)
 
-    return ConnectionsResponse(image_id=image_id, connections=results)
+    return ConnectionsResponse(image_id=image_id, connections=results[:5])

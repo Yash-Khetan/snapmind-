@@ -5,19 +5,20 @@ from backend.models.image_model import ImageRecord
 from backend.models.connection_model import Connection
 from backend.services.search_service import cosine_similarity
 
-# Minimum cosine similarity to create a connection between two images
-SIMILARITY_THRESHOLD = 0.8
+# Default number of top connections to create for an image
+TOP_K = 5
 
 
-def create_connections_for_image(new_image_id: int, new_embedding: list, db: Session) -> int:
+def create_connections_for_image(new_image_id: int, new_embedding: list, db: Session, top_k: int = TOP_K) -> int:
     """
     Compares the new image's embedding against every existing image embedding.
-    Creates a Connection record for each pair that scores >= SIMILARITY_THRESHOLD.
+    Creates Connection records for the top K (default 5) most similar existing images.
 
     Args:
         new_image_id: The database ID of the newly inserted image.
         new_embedding: The 384-dim embedding vector of the new image's OCR text.
         db: An active SQLAlchemy session.
+        top_k: Number of top similar images to connect to.
 
     Returns:
         The number of new connections created.
@@ -35,14 +36,22 @@ def create_connections_for_image(new_image_id: int, new_embedding: list, db: Ses
         .all()
     )
 
-    connections_created = 0
+    if not existing_images:
+        return 0
 
+    # Score each candidate existing image against the new image
+    scored_candidates = []
     for image in existing_images:
         score = cosine_similarity(new_embedding, image.embeddings)
+        scored_candidates.append((score, image))
 
-        if score < SIMILARITY_THRESHOLD:
-            continue
+    # Sort by similarity score descending and pick top_k
+    scored_candidates.sort(key=lambda x: x[0], reverse=True)
+    top_candidates = scored_candidates[:top_k]
 
+    connections_created = 0
+
+    for score, image in top_candidates:
         # Enforce consistent ordering: smaller ID is always image_a_id
         a_id = min(new_image_id, image.id)
         b_id = max(new_image_id, image.id)
