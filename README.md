@@ -1,82 +1,124 @@
+![alt text](image-1.png)
+
 # Snapmind
 
-Snapmind is an image upload backend built with FastAPI and SQLite. Uploaded images are saved to a local `images/` folder, and metadata is stored in a SQLite `Images` table.
+Snapmind is a full-stack image exploration app that lets users upload images, extract OCR text, generate semantic embeddings, search visual content by meaning, and explore relationships between images through a graph view.
 
-![alt text](image.png)
+## What the project does
 
-## Features
+Snapmind combines:
 
-- Single image upload endpoint
-- Local image storage in `images/`
-- SQLite metadata persistence for uploaded images
-- Static file serving for image access via `/images/<filename>`
+- a FastAPI backend for authentication, uploads, search, and graph APIs
+- a React + TypeScript frontend for the web experience
+- SQLite storage for users, image metadata, and semantic connections
+- OCR and embedding-based search to make images discoverable beyond filenames
+
+## Current features
+
+- User registration and login with JWT authentication
+- Image upload and batch upload support
+- OCR extraction from uploaded images
+- Semantic search over image content using embeddings
+- Query history per user
+- Image detail views
+- Graph-based visualization of image relationships
+- Protected frontend routes for authenticated users
+
+## Tech stack
+
+### Backend
+- FastAPI
+- SQLAlchemy
+- SQLite
+- Python-Multipart
+- PyTesseract
+- Pillow
+- Sentence Transformers
+- PyJWT
+- Passlib/Bcrypt
+
+### Frontend
+- React 19
+- TypeScript
+- Vite
+- React Router
+- Tailwind CSS
+- React Flow
 
 ## Project structure
 
-- `backend/`
-  - `app.py` - FastAPI application setup and route registration
-  - `routes/upload_routes.py` - upload API routes
-  - `services/upload_service.py` - image processing and storage business logic
-  - `utils/file_utils.py` - helper for saving uploaded files safely
-- `database/`
-  - `database.py` - SQLite initialization and record insertion
-- `images/` - stored uploaded files
-- `requirements.txt` - Python dependencies
+- backend/
+  - app.py - FastAPI app setup and route registration
+  - routes/ - auth, upload, search, image, and graph endpoints
+  - services/ - OCR, embeddings, upload, and search logic
+  - database/ - SQLite initialization and model definitions
+  - models/ - user, image, and connection schemas
+  - utils/ - auth and file helpers
+- frontend/
+  - src/pages/ - landing, dashboard, upload, search, graph, and detail views
+  - src/components/ - layout and graph UI components
+- images/ - uploaded image files
 
 ## Requirements
 
-- Python 3.11+ (or any Python version with `sqlite3` included)
-- `pip`
+- Python 3.11+
+- Node.js 18+ and npm
+- Tesseract OCR installed and available on your system path
 
-## Install
+## Backend setup
 
 ```bash
-cd snapmind
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
 pip install -r requirements.txt
+uvicorn app:app --reload
 ```
 
-> Note: `sqlite3` is part of the Python standard library, so no separate pip package is required.
+The API will be available at:
+- http://127.0.0.1:8000
+- Swagger docs: http://127.0.0.1:8000/docs
 
-## Run
+## Frontend setup
 
 ```bash
-uvicorn backend.app:app --reload
+cd frontend
+npm install
+npm run dev
 ```
 
-The app will start on `http://127.0.0.1:8000` by default.
+The frontend will be available at:
+- http://127.0.0.1:5173
 
-## API Endpoints
+## Main API endpoints
 
-### Single upload
+### Authentication
+- POST /api/auth/register
+- POST /api/auth/login
+- GET /api/auth/me
 
-`POST /upload`
+### Uploads
+- POST /api/upload
+- POST /api/upload-multiple
 
-- Form field: `image`
-- Content type: `multipart/form-data`
-- Response: saved image metadata
+### Search
+- POST /api/search
 
-Example using `curl`:
+### Graph
+- GET /api/graph
 
-```bash
-curl -X POST "http://127.0.0.1:8000/upload" \
-  -F "image=@/path/to/image.png"
-```
+### Images
+- GET /api/images
+- GET /api/images/{id}
 
-## Database table
+## Data storage
 
-The SQLite schema includes one table:
-
-- `Images`
-  - `id`
-  - `filename`
-  - `filepath`
-  - `uploaded_at`
-  - `ocr_text`
-  - `category`
-
-The database file is created under `database/snapmind.db`.
+- Uploaded images are stored in the images/ directory
+- Image metadata, OCR text, embeddings, and user records are persisted in SQLite
+- The database file is created at backend/database/snapmind.db
 
 ## Notes
 
-- Uploaded files are served statically from `/images/`
-- Additional metadata fields like `ocr_text` and `category` are prepared for future enhancements
+- The backend serves uploaded images statically from /images/
+- The app is currently configured for local development and uses local SQLite storage
+- OCR and semantic search depend on the available Python environment and Tesseract installation
