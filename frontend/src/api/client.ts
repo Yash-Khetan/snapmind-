@@ -1,4 +1,4 @@
-const HOST_URL = "http://localhost:8000";
+const HOST_URL = import.meta.env.VITE_API_URL; 
 const API_BASE = `${HOST_URL}/api`;
 
 export class ApiError extends Error {
