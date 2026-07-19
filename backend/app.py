@@ -45,3 +45,10 @@ app.include_router(graph_router, prefix="/api")
 @app.get("/")
 def health_check():
     return {"status": "ok", "message": "Snapmind Backend is running"}
+
+if __name__ == "__main__":
+    import uvicorn
+    import os
+    # Render provides the port in the PORT environment variable
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("app:app", host="0.0.0.0", port=port)

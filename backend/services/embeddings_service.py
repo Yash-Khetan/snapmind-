@@ -1,8 +1,16 @@
 from typing import List, Optional
 from sentence_transformers import SentenceTransformer
 
-# Load pretrained model once when the service is initialized
-model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+# Load pretrained model lazily to avoid blocking server startup
+model = None
+
+def get_model():
+    global model
+    if model is None:
+        print("Loading SentenceTransformer model...")
+        model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+        print("Model loaded successfully.")
+    return model
 
 def generate_text_embedding(text: Optional[str]) -> Optional[List[float]]:
     """
@@ -14,7 +22,8 @@ def generate_text_embedding(text: Optional[str]) -> Optional[List[float]]:
         
     try:
         # Calculate embeddings
-        vector = model.encode(text)
+        m = get_model()
+        vector = m.encode(text)
         # MUST convert numpy array to pure Python list (.tolist()) so SQLAlchemy/JSON can serialize it
         return vector.tolist()
     except Exception as e:
