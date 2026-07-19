@@ -33,7 +33,7 @@ async def upload_file(
             detail="No file received. Use form-data with a single file under the 'image' field."
         )
 
-    return await upload_service.process_file(file_to_process)
+    return await upload_service.process_file(file_to_process, user_id=current_user.id)
 
 
 @router.post("/upload-multiple")
@@ -56,4 +56,4 @@ async def upload_multiple_files(
             detail="No files received. Use form-data with one or more files under the 'images' field.",
         )
 
-    return await upload_service.process_files(files_to_process)
+    return await upload_service.process_files(files_to_process, user_id=current_user.id)

@@ -33,7 +33,7 @@ def get_db():
     finally:
         db.close()
 
-def insert_image_record(filename: str, filepath: str, ocr_text: str = None, category: str = None, embeddings: list = None) -> int:
+def insert_image_record(filename: str, filepath: str, ocr_text: str = None, category: str = None, embeddings: list = None, user_id: int = None) -> int:
     """
     Inserts a new image record into the Images SQLite table and returns the generated primary key ID.
     """
@@ -46,7 +46,8 @@ def insert_image_record(filename: str, filepath: str, ocr_text: str = None, cate
             filepath=filepath,
             ocr_text=ocr_text,
             category=category,
-            embeddings=embeddings
+            embeddings=embeddings,
+            user_id=user_id
         )
 
         db.add(record)

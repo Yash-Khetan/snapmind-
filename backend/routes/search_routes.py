@@ -51,7 +51,7 @@ def search(
         )
 
     # Run the semantic search
-    results = search_images(query=body.query.strip(), db=db)
+    results = search_images(query=body.query.strip(), db=db, user_id=current_user.id)
     
     # Update filepaths with signed URLs
     for result in results:

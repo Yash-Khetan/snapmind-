@@ -50,7 +50,7 @@ def list_images(
     Returns all uploaded images with their connection counts.
     Supports sorting by 'newest' (default) or 'connections'.
     """
-    images = db.query(ImageRecord).all()
+    images = db.query(ImageRecord).filter(ImageRecord.user_id == current_user.id).all()
 
     results = []
     for img in images:
@@ -89,7 +89,7 @@ def get_image(
     """
     Returns a single image's details by ID.
     """
-    image = db.query(ImageRecord).filter(ImageRecord.id == image_id).first()
+    image = db.query(ImageRecord).filter(ImageRecord.id == image_id, ImageRecord.user_id == current_user.id).first()
     if not image:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

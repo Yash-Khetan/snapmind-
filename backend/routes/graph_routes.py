@@ -46,7 +46,7 @@ def get_graph(
     """
     images = (
         db.query(ImageRecord)
-        .filter(ImageRecord.embeddings.isnot(None))
+        .filter(ImageRecord.user_id == current_user.id, ImageRecord.embeddings.isnot(None))
         .all()
     )
 
@@ -60,7 +60,12 @@ def get_graph(
         for img in images
     ]
 
-    connections = db.query(Connection).all()
+    image_ids = {img.id for img in images}
+    connections = (
+        db.query(Connection)
+        .filter(Connection.image_a_id.in_(image_ids), Connection.image_b_id.in_(image_ids))
+        .all()
+    )
 
     edges = [
         GraphEdge(

@@ -40,8 +40,8 @@ def get_connections(
     Returns all images semantically connected to the given image,
     along with their similarity scores.
     """
-    # Verify the image exists
-    image = db.query(ImageRecord).filter(ImageRecord.id == image_id).first()
+    # Verify the image exists and belongs to the current user
+    image = db.query(ImageRecord).filter(ImageRecord.id == image_id, ImageRecord.user_id == current_user.id).first()
     if not image:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

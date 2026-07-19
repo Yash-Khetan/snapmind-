@@ -32,10 +32,10 @@ def cosine_similarity(vec_a: list, vec_b: list) -> float:
     return float(dot_product / (norm_a * norm_b))
 
 
-def search_images(query: str, db: Session, top_k: int = TOP_K) -> List[Dict[str, Any]]:
+def search_images(query: str, db: Session, top_k: int = TOP_K, user_id: int = None) -> List[Dict[str, Any]]:
     """
     1. Generate an embedding for the user's query text.
-    2. Fetch all image records that have a stored embedding.
+    2. Fetch all image records that have a stored embedding for the given user.
     3. Compute cosine similarity between the query embedding and each image embedding.
     4. Return the top K (default 5) most similar images, sorted by similarity descending.
     """
@@ -44,10 +44,14 @@ def search_images(query: str, db: Session, top_k: int = TOP_K) -> List[Dict[str,
     if query_embedding is None:
         return []
 
-    # Step 2 — fetch all images with non-null embeddings
+    # Step 2 — fetch all images with non-null embeddings for the user
+    query_filter = [ImageRecord.embeddings.isnot(None)]
+    if user_id is not None:
+        query_filter.append(ImageRecord.user_id == user_id)
+
     images = (
         db.query(ImageRecord)
-        .filter(ImageRecord.embeddings.isnot(None))
+        .filter(*query_filter)
         .all()
     )
 

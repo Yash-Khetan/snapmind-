@@ -25,7 +25,7 @@ export default function Dashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  const totalConnections = images.reduce((sum, img) => sum + img.connections_count, 0);
+  // const totalConnections = Math.round(images.reduce((sum, img) => sum + img.connections_count, 0) / 2);
   const uniqueTopics = new Set(images.map((img) => img.filename.split(".")[0])).size;
   const recentImages = images.slice(0, 8);
   const mostConnected = [...images].sort((a, b) => b.connections_count - a.connections_count).slice(0, 4);
@@ -45,7 +45,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-3 gap-4 mb-10">
           {[
             { label: "Images captured", value: images.length },
-            { label: "Connections found", value: totalConnections },
+            // { label: "Connections found", value: totalConnections },
             { label: "Topics explored", value: uniqueTopics },
           ].map((stat) => (
             <div key={stat.label} className="bg-surface border border-border rounded-lg px-5 py-4">

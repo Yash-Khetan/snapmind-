@@ -13,7 +13,7 @@ class UploadService:
         self._counter = 0
         self._store = []
 
-    async def process_file(self, file: UploadFile) -> dict:
+    async def process_file(self, file: UploadFile, user_id: int = None) -> dict:
         """
         Processes a single file: saves it to disk, runs OCR, generates embeddings, and saves to SQLite.
         Returns the formatted dictionary output.
@@ -49,7 +49,8 @@ class UploadService:
             filepath=file_path,
             ocr_text=extracted_ocr_text,
             category=None,
-            embeddings=ocr_embedding
+            embeddings=ocr_embedding,
+            user_id=user_id
         )
         print(f"[DEBUG] Step 4 complete: Database record inserted with db_id={db_id}")
 
@@ -91,7 +92,7 @@ class UploadService:
 
 
 
-    async def process_files(self, files: List[UploadFile]) -> List[dict]:
+    async def process_files(self, files: List[UploadFile], user_id: int = None) -> List[dict]:
         """
         Processes multiple files and returns a list of metadata dictionaries.
         """
@@ -100,7 +101,7 @@ class UploadService:
         for idx, file in enumerate(files, start=1):
             print(f"[DEBUG] Batch processing file {idx}/{len(files)}: {file.filename}")
             try:
-                metadata = await self.process_file(file)
+                metadata = await self.process_file(file, user_id=user_id)
                 results.append(metadata)
                 print(f"[DEBUG] Batch file {idx}/{len(files)} succeeded.")
             except Exception as e:
