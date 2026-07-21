@@ -10,6 +10,7 @@ from routes.search_routes import router as search_router
 from routes.connection_routes import router as connection_router
 from routes.image_routes import router as image_router
 from routes.graph_routes import router as graph_router
+from routes.clustering_routes import router as clustering_router
 
 # Load environment variables from .env
 load_dotenv()
@@ -41,6 +42,7 @@ app.include_router(search_router, prefix="/api")
 app.include_router(connection_router, prefix="/api")
 app.include_router(image_router, prefix="/api")
 app.include_router(graph_router, prefix="/api")
+app.include_router(clustering_router, prefix="/api")
 
 @app.get("/")
 def health_check():

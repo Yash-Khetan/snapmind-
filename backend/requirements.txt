@@ -12,3 +12,4 @@ numpy
 python-dotenv==1.0.1
 supabase
 psycopg2-binary
+scikit-learn
